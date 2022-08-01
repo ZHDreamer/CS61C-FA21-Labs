@@ -55,7 +55,7 @@ main:
 # FIXME Fix the reported error in this function (you can delete lines
 # if necessary, as long as the function still returns 1 in a0).
 simple_fn:
-    mv a0, t0
+    # mv a0, t0
     li a0, 1
     ret
 
@@ -76,6 +76,9 @@ simple_fn:
 # missing. Another hint: what does the "s" in "s0" stand for?
 naive_pow:
     # BEGIN PROLOGUE
+    addi sp, sp, -8
+    sw ra, 4(sp)
+    sw s0, 0(sp)
     # END PROLOGUE
     li s0, 1
 naive_pow_loop:
@@ -86,6 +89,9 @@ naive_pow_loop:
 naive_pow_end:
     mv a0, s0
     # BEGIN EPILOGUE
+    lw s0, 0(sp)
+    lw ra, 4(sp)
+    addi sp, sp, 8
     # END EPILOGUE
     ret
 
@@ -98,15 +104,18 @@ naive_pow_end:
 inc_arr:
     # BEGIN PROLOGUE
     # FIXME What other registers need to be saved?
-    addi sp, sp, -4
-    sw ra, 0(sp)
+    addi sp, sp, -16
+    sw ra, 12(sp)
+    sw s0, 8(sp)
+    sw s1, 4(sp)
+    sw s2, 0(sp)
     # END PROLOGUE
     mv s0, a0 # Copy start of array to saved register
     mv s1, a1 # Copy length of array to saved register
-    li t0, 0 # Initialize counter to 0
+    li s2, 0 # Initialize counter to 0
 inc_arr_loop:
-    beq t0, s1, inc_arr_end
-    slli t1, t0, 2 # Convert array index to byte offset
+    beq s2, s1, inc_arr_end
+    slli t1, s2, 2 # Convert array index to byte offset
     add a0, s0, t1 # Add offset to start of array
     # Prepare to call helper_fn
     #
@@ -116,12 +125,15 @@ inc_arr_loop:
     #
     jal helper_fn
     # Finished call for helper_fn
-    addi t0, t0, 1 # Increment counter
+    addi s2, s2, 1 # Increment counter
     j inc_arr_loop
 inc_arr_end:
     # BEGIN EPILOGUE
-    lw ra, 0(sp)
-    addi sp, sp, 4
+    lw s2, 0(sp)
+    lw s1, 4(sp)
+    lw s0, 8(sp)
+    lw ra, 12(sp)
+    addi sp, sp, 16
     # END EPILOGUE
     ret
 
@@ -135,11 +147,15 @@ inc_arr_end:
 # as appropriate.
 helper_fn:
     # BEGIN PROLOGUE
+    addi sp, sp, -4
+    sw s0, 0(sp)
     # END PROLOGUE
-    lw t1, 0(a0)
-    addi s0, t1, 1
+    lw s0, 0(a0)
+    addi s0, s0, 1
     sw s0, 0(a0)
     # BEGIN EPILOGUE
+    lw s0, 0(sp)
+    addi sp, sp, 4
     # END EPILOGUE
     ret
 
@@ -162,7 +178,7 @@ check_arr_loop:
     j check_arr_loop
 check_arr_end:
     ret
-    
+
 
 # This isn't really a function - it just prints a message, then
 # terminates the program on failure. Think of it like an exception.
@@ -172,4 +188,4 @@ failure:
     ecall
     li a0, 10 # Exit ecall
     ecall
-    
+
