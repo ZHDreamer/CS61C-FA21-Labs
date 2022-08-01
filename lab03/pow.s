@@ -1,6 +1,6 @@
 .text
 main:
-	addi a0, zero, 20
+    addi a0, zero, 20
     addi a1, zero, 30
     jal lcm
     addi t0, t0, 0
