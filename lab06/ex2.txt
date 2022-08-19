@@ -1,0 +1,2 @@
+t_{CLK-to-Q}+t_{mul}+t_{setup}=75ns
+1/75ns=13MHZ

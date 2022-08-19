@@ -1,0 +1,1 @@
+t_{CLK-to-Q}+t_{mul}+t_{add}+t_{setup}=120ns

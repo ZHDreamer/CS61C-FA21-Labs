@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<project source="3.4.3-61c.db850b2" version="1.0">
+<project source="3.4.3-61c.cc0f4a6" version="1.0">
   This file is intended to be loaded by Logisim-evolution (https://github.com/reds-heig/logisim-evolution).
 
   <lib desc="#Wiring" name="0">
@@ -165,9 +165,34 @@
       <a name="output" val="true"/>
       <a name="width" val="8"/>
     </comp>
+    <comp lib="3" loc="(290,120)" name="Multiplier"/>
+    <comp lib="3" loc="(610,130)" name="Adder"/>
+    <comp lib="4" loc="(390,90)" name="Register">
+      <a name="appearance" val="logisim_evolution"/>
+    </comp>
+    <comp lib="4" loc="(650,100)" name="Register">
+      <a name="appearance" val="logisim_evolution"/>
+    </comp>
     <wire from="(170,150)" to="(190,150)"/>
-    <wire from="(170,210)" to="(190,210)"/>
+    <wire from="(170,210)" to="(370,210)"/>
     <wire from="(170,90)" to="(190,90)"/>
-    <wire from="(790,130)" to="(810,130)"/>
+    <wire from="(190,110)" to="(250,110)"/>
+    <wire from="(190,130)" to="(190,150)"/>
+    <wire from="(190,130)" to="(250,130)"/>
+    <wire from="(190,90)" to="(190,110)"/>
+    <wire from="(290,120)" to="(390,120)"/>
+    <wire from="(370,160)" to="(370,210)"/>
+    <wire from="(370,160)" to="(390,160)"/>
+    <wire from="(370,210)" to="(640,210)"/>
+    <wire from="(450,120)" to="(570,120)"/>
+    <wire from="(560,140)" to="(560,230)"/>
+    <wire from="(560,140)" to="(570,140)"/>
+    <wire from="(560,230)" to="(750,230)"/>
+    <wire from="(610,130)" to="(650,130)"/>
+    <wire from="(640,170)" to="(640,210)"/>
+    <wire from="(640,170)" to="(650,170)"/>
+    <wire from="(710,130)" to="(750,130)"/>
+    <wire from="(750,130)" to="(750,230)"/>
+    <wire from="(750,130)" to="(810,130)"/>
   </circuit>
 </project>
