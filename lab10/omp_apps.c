@@ -1,64 +1,70 @@
 #include "omp_apps.h"
 
-/* -------------------------------Utilties, Do Not Modify------------------------------*/
-double* gen_array(int n) {
-    double* array = (double*)malloc(n * sizeof(double));
+/* -------------------------------Utilties, Do Not
+ * Modify------------------------------*/
+double *gen_array(int n) {
+    double *array = (double *)malloc(n * sizeof(double));
     for (int i = 0; i < n; i++) array[i] = drand48();
     return array;
 }
 
-int verify(double* x, double* y, void(*funct)(double *x, double *y, double *z)) {
-    double *z_v_add = (double*) malloc(ARRAY_SIZE*sizeof(double));
-    double *z_oracle = (double*) malloc(ARRAY_SIZE*sizeof(double));
+int verify(double *x, double *y,
+           void (*funct)(double *x, double *y, double *z)) {
+    double *z_v_add  = (double *)malloc(ARRAY_SIZE * sizeof(double));
+    double *z_oracle = (double *)malloc(ARRAY_SIZE * sizeof(double));
     (*funct)(x, y, z_v_add);
-    for(int i=0; i<ARRAY_SIZE; i++){
+    for (int i = 0; i < ARRAY_SIZE; i++) {
         z_oracle[i] = x[i] + y[i];
     }
-    for(int i=0; i<ARRAY_SIZE; i++){
-        if(z_oracle[i] != z_v_add[i])
-            return 0;
+    for (int i = 0; i < ARRAY_SIZE; i++) {
+        if (z_oracle[i] != z_v_add[i]) return 0;
     }
     return 1;
 }
 
-/* -------------------------------Vector Addition------------------------------*/
+/* -------------------------------Vector
+ * Addition------------------------------*/
 // BEGIN PART 1 EX 2
-void v_add_naive(double* x, double* y, double* z) {
+void v_add_naive(double *x, double *y, double *z) {
     #pragma omp parallel
     {
-        for(int i=0; i<ARRAY_SIZE; i++)
-            z[i] = x[i] + y[i];
+        for (int i = 0; i < ARRAY_SIZE; i++) z[i] = x[i] + y[i];
     }
 }
 
 // Adjacent Method
-void v_add_optimized_adjacent(double* x, double* y, double* z) {
-    // TODO: Modify this function
+void v_add_optimized_adjacent(double *x, double *y, double *z) {
+    // DONE: Modify this function
     // Do NOT use the `for` directive here!
     #pragma omp parallel
     {
-        for(int i=0; i<ARRAY_SIZE; i++)
-            z[i] = x[i] + y[i];
+        int num = omp_get_num_threads(), thread = omp_get_thread_num();
+        for (int i = thread; i < ARRAY_SIZE; i += num) z[i] = x[i] + y[i];
     }
 }
 
 // Chunks Method
-void v_add_optimized_chunks(double* x, double* y, double* z) {
-    // TODO: Modify this function
+void v_add_optimized_chunks(double *x, double *y, double *z) {
+    // DONE: Modify this function
     // Do NOT use the `for` directive here!
     #pragma omp parallel
     {
-        for(int i=0; i<ARRAY_SIZE; i++)
-            z[i] = x[i] + y[i];
+        int num = omp_get_num_threads(), thread = omp_get_thread_num();
+
+        int start = (ARRAY_SIZE / num + 1) * thread;
+        int end   = (ARRAY_SIZE / num + 1) * (thread + 1);
+
+        end = (end < ARRAY_SIZE) ? end : ARRAY_SIZE;
+        for (int i = start; i < end; i++) z[i] = x[i] + y[i];
     }
 }
 // END PART 1 EX 2
 
 /* -------------------------------Dot Product------------------------------*/
 // BEGIN PART 1 EX 3
-double dotp_naive(double* x, double* y, int arr_size) {
+double dotp_naive(double *x, double *y, int arr_size) {
     double global_sum = 0.0;
-#pragma omp parallel
+    #pragma omp parallel
     {
         #pragma omp for
         for (int i = 0; i < arr_size; i++)
@@ -69,43 +75,47 @@ double dotp_naive(double* x, double* y, int arr_size) {
 }
 
 // Manual Reduction
-double dotp_manual_optimized(double* x, double* y, int arr_size) {
-    // TODO: Modify this function
+double dotp_manual_optimized(double *x, double *y, int arr_size) {
+    // DONE: Modify this function
     // Do NOT use the `reduction` directive here!
     double global_sum = 0.0;
-    #pragma omp parallel
-    {
-        #pragma omp for
-        for (int i = 0; i < arr_size; i++)
-            #pragma omp critical
+    #pragma omp parallel for
+    for (int i = 0; i <= arr_size - 4; i += 4) {
+        #pragma omp critical
+        {
             global_sum += x[i] * y[i];
+            global_sum += x[i + 1] * y[i + 1];
+            global_sum += x[i + 2] * y[i + 2];
+            global_sum += x[i + 3] * y[i + 3];
+        }
     }
+    for (int i = arr_size / 4 * 4; i < arr_size; i++) {
+        global_sum += x[i] * y[i];
+    }
+
     return global_sum;
 }
 
 // Reduction Keyword
-double dotp_reduction_optimized(double* x, double* y, int arr_size) {
-    // TODO: Modify this function
+double dotp_reduction_optimized(double *x, double *y, int arr_size) {
+    // DONE: Modify this function
     // Please DO use the `reduction` directive here!
     double global_sum = 0.0;
-    #pragma omp parallel
-    {
-        #pragma omp for
-        for (int i = 0; i < arr_size; i++)
-            #pragma omp critical
-            global_sum += x[i] * y[i];
+    #pragma omp parallel for reduction(+ : global_sum)
+    for (int i = 0; i < arr_size; i++) {
+        global_sum += x[i] * y[i];
     }
     return global_sum;
 }
 // END PART 1 EX 3
 
-char* compute_dotp(int arr_size) {
+char *compute_dotp(int arr_size) {
     // Generate input vectors
-    char* report_buf = (char*)malloc(BUF_SIZE), *pos = report_buf;
+    char  *report_buf = (char *)malloc(BUF_SIZE), *pos = report_buf;
     double start_time, run_time;
 
     double *x = gen_array(arr_size), *y = gen_array(arr_size);
-    double serial_result = 0.0, result = 0.0;
+    double  serial_result = 0.0, result = 0.0;
 
     // calculate result serially
     for (int i = 0; i < arr_size; i++) {
@@ -116,9 +126,11 @@ char* compute_dotp(int arr_size) {
     for (int i = 1; i <= num_threads; i++) {
         omp_set_num_threads(i);
         start_time = omp_get_wtime();
-        for (int j = 0; j < REPEAT; j++) result = dotp_manual_optimized(x, y, arr_size);
+        for (int j = 0; j < REPEAT; j++)
+            result = dotp_manual_optimized(x, y, arr_size);
         run_time = omp_get_wtime() - start_time;
-        pos += sprintf(pos, "Manual Optimized: %d thread(s) took %f seconds\n", i, run_time);
+        pos += sprintf(pos, "Manual Optimized: %d thread(s) took %f seconds\n",
+                       i, run_time);
 
         // verify result is correct (within some threshold)
         if (fabs(serial_result - result) > 0.001) {
@@ -137,8 +149,9 @@ char* compute_dotp(int arr_size) {
         }
 
         run_time = omp_get_wtime() - start_time;
-        pos += sprintf(pos, "Reduction Optimized: %d thread(s) took %f seconds\n",
-                       i, run_time);
+        pos +=
+            sprintf(pos, "Reduction Optimized: %d thread(s) took %f seconds\n",
+                    i, run_time);
 
         // verify result is correct (within some threshold)
         if (fabs(serial_result - result) > 0.001) {
