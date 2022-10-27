@@ -8,7 +8,7 @@
 /* Define what our struct is */
 struct vector_t {
     size_t size;
-    int *data;
+    int   *data;
 };
 
 /* Utility function to handle allocation failures. In this

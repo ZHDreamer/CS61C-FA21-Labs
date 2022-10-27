@@ -18,6 +18,7 @@ void set_bit(unsigned *x, unsigned n, unsigned v) {
     // *x = (*x & mask) | ((*x ^ (1 << n)) & mask);
     // A = (A+B)*(A+^B)
     unsigned mask = v << n;
+
     *x = (*x | mask) & ((*x ^ (1 << n)) | mask);
 }
 

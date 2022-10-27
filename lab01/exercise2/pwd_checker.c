@@ -22,7 +22,7 @@ For the simplicity of this exercise:
 
 /* Returns true if the length of PASSWORD is at least 10, false otherwise */
 bool check_length(const char *password) {
-    int length = strlen(password);
+    int  length        = strlen(password);
     bool meets_len_req = (length >= 10);
     return meets_len_req;
 }
@@ -79,7 +79,7 @@ bool check_name(const char *first_name, const char *last_name,
     /* Hint: a NULL pointer will evaluate to False in a logical statement while
        a non-NULL pointer will evaluate to True */
     const char *first = strstr(password, first_name);
-    const char *last = strstr(password, last_name);
+    const char *last  = strstr(password, last_name);
     return !(first || last);
 }
 

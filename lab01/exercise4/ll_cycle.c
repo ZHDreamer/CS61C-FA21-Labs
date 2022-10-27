@@ -3,7 +3,7 @@
 #include "ll_cycle.h"
 
 int ll_has_cycle(node *head) {
-    /* TODO: Implement ll_has_cycle */
+    /* DONE: Implement ll_has_cycle */
     if (head == NULL) {
         return 0;
     }

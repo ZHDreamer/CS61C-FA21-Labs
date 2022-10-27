@@ -63,12 +63,12 @@ void reverse_list(struct Node **head) {
     }
     struct Node *curr = *head;
     struct Node *next = (*head)->next;
-    curr->next = NULL;
+    curr->next        = NULL;
     while (next != NULL) {
         struct Node *temp = next->next;
-        next->next = curr;
-        curr = next;
-        next = temp;
+        next->next        = curr;
+        curr              = next;
+        next              = temp;
     }
     *head = curr;
 }
